@@ -26,6 +26,7 @@
     ],
     "rules":{
        "import/no-unresolved":"error",
+       "react/require-default-props":"off",
        "prettier/prettier":"error",
        "@typescript-eslint/naming-convention":[
           "error",
