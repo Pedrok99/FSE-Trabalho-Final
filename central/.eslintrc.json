@@ -27,6 +27,7 @@
     "rules":{
        "import/no-unresolved":"error",
        "react/require-default-props":"off",
+       "react/jsx-props-no-spreading":"off",
        "prettier/prettier":"error",
        "@typescript-eslint/naming-convention":[
           "error",
