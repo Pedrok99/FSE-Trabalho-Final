@@ -54,3 +54,19 @@ menu "(FSE-CFG) Modo de Energia"
     endchoice
 
 endmenu
+
+menu "(FSE-CFG) Basic ESP Config"
+
+    config ESP_ROOT_TOPIC
+        string "Root topic"
+        default "fse2021"
+        help
+            Tópico root.
+    
+    config ESP_MATRICULA
+        string "Matrícula"
+        default "180106970"
+        help
+            Matrícula.
+
+endmenu
