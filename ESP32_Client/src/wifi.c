@@ -26,6 +26,10 @@ static EventGroupHandle_t s_wifi_event_group;
 
 static int s_retry_num = 0;
 
+
+extern xSemaphoreHandle wifi_semaphore;
+
+
 static void event_handler(void* arg, esp_event_base_t event_base,
                                 int32_t event_id, void* event_data)
 {
@@ -45,6 +49,7 @@ static void event_handler(void* arg, esp_event_base_t event_base,
         ESP_LOGI(TAG, "Endereço IP recebido:" IPSTR, IP2STR(&event->ip_info.ip));
         s_retry_num = 0;
         xEventGroupSetBits(s_wifi_event_group, WIFI_CONNECTED_BIT);
+        xSemaphoreGive(wifi_semaphore);
     }
 }
 
@@ -94,9 +99,10 @@ void wifi_start(){
     } else {
         ESP_LOGE(TAG, "UNEXPECTED EVENT");
     }
-
+    // remove later
     ESP_ERROR_CHECK(esp_event_handler_unregister(IP_EVENT, IP_EVENT_STA_GOT_IP, &event_handler));
     ESP_ERROR_CHECK(esp_event_handler_unregister(WIFI_EVENT, ESP_EVENT_ANY_ID, &event_handler));
+    // until here
     vEventGroupDelete(s_wifi_event_group);
 }
 
