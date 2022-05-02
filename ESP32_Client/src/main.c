@@ -5,8 +5,9 @@
 #include "wifi.h"
 #include "freertos/semphr.h"
 #include "esp_log.h"
-
+#include "esp_system.h"
 #include "mqtt.h"
+
 
 #define TAG "Main"
 
@@ -18,10 +19,10 @@ void onWifiConnected(void *params){
         if(xSemaphoreTake(wifi_semaphore, portMAX_DELAY)){
             ESP_LOGI(TAG, "Conectado ao wifi");
             mqtt_start();
+
         }
         vTaskDelay(2000 / portTICK_PERIOD_MS);
     }
-    
 }
 
 void app_main(){
@@ -40,7 +41,6 @@ void app_main(){
     wifi_start();
 
     xTaskCreate(&onWifiConnected, "onWifiConnected", 2048, NULL, 1, NULL);
-
 
 
     // DHT11_init(GPIO_NUM_4);
