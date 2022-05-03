@@ -1,11 +1,13 @@
 import {
   Box,
   Button,
+  Checkbox,
   Flex,
   FormControl,
   FormErrorMessage,
   FormLabel,
-  Input
+  Input,
+  Stack
 } from '@chakra-ui/react'
 import { useForm } from 'react-hook-form'
 
@@ -73,6 +75,15 @@ function AddForm({ addEspInfo, onClose }: IAddFormProps) {
             </FormErrorMessage>
           </Box>
         </Flex>
+
+        <Stack spacing={5} direction="row">
+          <Checkbox id="hasAlarm" {...register('hasAlarm', {})}>
+            Alarme
+          </Checkbox>
+          <Checkbox id="hasTempSensor" {...register('hasTempSensor', {})}>
+            Temperatura + Humidade
+          </Checkbox>
+        </Stack>
       </FormControl>
       <Box textAlign="right">
         <Button

@@ -16,14 +16,19 @@ function App() {
     setESPsInfo([...ESPsInfo, espInfo])
   }
 
+  const disconnectEsp = (espId: string) => {
+    setESPsInfo(ESPsInfo.filter((esp) => esp.espId !== espId))
+  }
+
   return (
     <>
       <Navbar openAddModal={onOpen} />
       {ESPsInfo.length > 0 ? (
-        <Grid templateColumns="repeat(5, 1fr)" gap={6} p="10">
+        <Grid templateColumns="repeat(4, 1fr)" gap={6} p="10">
           {ESPsInfo.map((espInfo: IEspInfo) => (
             <GridItem key={espInfo.espId}>
               <MonitoringCard
+                disconect={() => disconnectEsp(espInfo.espId)}
                 espStatus={{ status: 'Desconectado' }}
                 espInfo={espInfo}
               />

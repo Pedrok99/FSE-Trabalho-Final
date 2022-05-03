@@ -3,10 +3,8 @@ import {
   ModalOverlay,
   ModalContent,
   ModalHeader,
-  ModalFooter,
   ModalBody,
-  ModalCloseButton,
-  Button
+  ModalCloseButton
 } from '@chakra-ui/react'
 import { ReactNode } from 'react'
 
@@ -26,15 +24,6 @@ function AddESPModal({ children, isOpen, onClose, title }: IModalPros) {
         <ModalCloseButton />
 
         <ModalBody>{children}</ModalBody>
-
-        {/* <ModalFooter>
-          <Button colorScheme="blue" mr={3} onClick={onClose}>
-            Fechar
-          </Button>
-          <Button colorScheme="green" color="white">
-            Adicionar
-          </Button>
-        </ModalFooter> */}
       </ModalContent>
     </Modal>
   )
