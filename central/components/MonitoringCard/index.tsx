@@ -14,12 +14,10 @@ import {
   BsLightningCharge,
   BsBell,
 } from 'react-icons/bs';
-
-// import alarmSound from '../../assets/audio/alarm.mp3';
 import { IEspInfo, IEspStatus } from '../../types/ESPTypes';
 import InfoLine from '../InfoLine';
 import Status from '../Status';
-import './MonitoringCard.module.css';
+import styles from './MonitoringCard.module.css';
 
 export interface IMonitoringCardProps {
   espInfo: IEspInfo;
@@ -34,16 +32,16 @@ function MonitoringCard({
 }: IMonitoringCardProps) {
   const [isActivated, setIsActivated] = useState(false);
   const [isAlarmOn, setIsAlarmOn] = useState(false);
-  // const songRef = useRef(new Audio(alarmSound));
-  // songRef.current.loop = true;
-  // const audioMenager = (alarmActivated: boolean) => {
-  //   if (alarmActivated) {
-  //     songRef.current.play();
-  //   } else {
-  //     songRef.current.pause();
-  //   }
-  //   setIsAlarmOn(alarmActivated);
-  // };
+  const songRef = useRef(new Audio('/assets/audio/alarm.mp3'));
+  songRef.current.loop = true;
+  const audioMenager = (alarmActivated: boolean) => {
+    if (alarmActivated) {
+      songRef.current.play();
+    } else {
+      songRef.current.pause();
+    }
+    setIsAlarmOn(alarmActivated);
+  };
 
   return (
     <Container
@@ -98,12 +96,12 @@ function MonitoringCard({
           <InfoLine
             InfoIcon={BsBell}
             InfoIconColor={isAlarmOn ? 'red' : ''}
-            InfoIconClass={isAlarmOn ? 'alarm' : ''}
+            InfoIconClass={isAlarmOn ? styles.alarm : ''}
             label="Alarme"
             UpdateComponent={
               <Switch
                 onChange={() => {
-                  // audioMenager(!isAlarmOn);
+                  audioMenager(!isAlarmOn);
                 }}
                 defaultChecked={isAlarmOn}
               />
@@ -117,8 +115,8 @@ function MonitoringCard({
           size="sm"
           colorScheme="red"
           onClick={() => {
-            // audioMenager(false);
-            // songRef.current.remove();
+            audioMenager(false);
+            songRef.current.remove();
             disconect();
           }}
         >

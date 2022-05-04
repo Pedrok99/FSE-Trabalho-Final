@@ -1,13 +1,14 @@
-import { Flex, Text } from '@chakra-ui/react'
-import { IconType } from 'react-icons'
+import { Flex, Text } from '@chakra-ui/react';
+import React from 'react';
+import { IconType } from 'react-icons';
 
 interface IInfoLineProps {
-  InfoIcon?: IconType
-  InfoIconColor?: string
-  InfoIconClass?: string
-  label: string
-  value?: string
-  UpdateComponent?: React.ReactElement
+  InfoIcon?: IconType;
+  InfoIconColor?: string;
+  InfoIconClass?: string;
+  label: string;
+  value?: string;
+  UpdateComponent?: React.ReactElement;
 }
 
 function InfoLine({
@@ -16,7 +17,7 @@ function InfoLine({
   InfoIconClass,
   label,
   value,
-  UpdateComponent
+  UpdateComponent,
 }: IInfoLineProps) {
   return (
     <Flex justify="space-between">
@@ -29,7 +30,7 @@ function InfoLine({
       {value && !UpdateComponent && <Text>{value}</Text>}
       {UpdateComponent || null}
     </Flex>
-  )
+  );
 }
 
-export default InfoLine
+export default InfoLine;
