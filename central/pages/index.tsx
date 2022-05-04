@@ -1,24 +1,25 @@
-import { Grid, GridItem, useDisclosure } from '@chakra-ui/react'
-import { useState } from 'react'
+import type { NextPage } from 'next';
+import { Grid, GridItem, useDisclosure } from '@chakra-ui/react';
+import { useState } from 'react';
 
-import AddForm from './components/Form'
-import Loading from './components/Loading'
-import AddESPModal from './components/Modal'
-import MonitoringCard from './components/MonitoringCard'
-import Navbar from './components/Navbar'
-import { IEspInfo } from './types/ESPTypes'
+import AddForm from '../components/Form';
+import Loading from '../components/Loading';
+import AddESPModal from '../components/Modal';
+import MonitoringCard from '../components/MonitoringCard';
+import Navbar from '../components/Navbar';
+import { IEspInfo } from '../types/ESPTypes';
 
-function App() {
-  const { isOpen, onOpen, onClose } = useDisclosure()
-  const [ESPsInfo, setESPsInfo] = useState<IEspInfo[]>([])
+const Home: NextPage = () => {
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [ESPsInfo, setESPsInfo] = useState<IEspInfo[]>([]);
 
   const addEspInfo = (espInfo: IEspInfo) => {
-    setESPsInfo([...ESPsInfo, espInfo])
-  }
+    setESPsInfo([...ESPsInfo, espInfo]);
+  };
 
   const disconnectEsp = (espId: string) => {
-    setESPsInfo(ESPsInfo.filter((esp) => esp.espId !== espId))
-  }
+    setESPsInfo(ESPsInfo.filter((esp) => esp.espId !== espId));
+  };
 
   return (
     <>
@@ -42,7 +43,7 @@ function App() {
         <AddForm addEspInfo={addEspInfo} onClose={onClose} />
       </AddESPModal>
     </>
-  )
-}
+  );
+};
 
-export default App
+export default Home;

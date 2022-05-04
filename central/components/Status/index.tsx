@@ -1,31 +1,31 @@
-import { Center, Circle, Text } from '@chakra-ui/react'
+import { Center, Circle, Text } from '@chakra-ui/react';
 
-import './styles.css'
-import { IEspStatus } from '../../types/ESPTypes'
+import styles from './Status.module.css';
+import { IEspStatus } from '../../types/ESPTypes';
 
 function Status({ status }: IEspStatus) {
   const statusColor = {
     Conectado: {
       text: 'green.700',
-      circle: 'green'
+      circle: 'green',
     },
     Desconectado: {
       text: 'red.700',
-      circle: 'red'
-    }
-  }
+      circle: 'red',
+    },
+  };
   return (
     <Center gap={2}>
       <Circle
         size={3}
         bg={`${statusColor[status].circle}`}
-        className={`${status === 'Conectado' ? 'pulsate' : ''}`}
+        className={`${status === 'Conectado' ? styles.pulsate : ''}`}
       />
       <Text fontSize="sm" color={`${statusColor[status].text}`}>
         {status}
       </Text>
     </Center>
-  )
+  );
 }
 
-export default Status
+export default Status;

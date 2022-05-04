@@ -1,94 +1,38 @@
 {
-    "env":{
-       "browser":true,
-       "es2021":true
+    "env": {
+        "browser": true,
+        "es2021": true
     },
-    "extends":[
-       "plugin:react/recommended",
-       "airbnb",
-       "plugin:@typescript-eslint/recommended",
-       "prettier",
-       "plugin:prettier/recommended"
+    "extends": [
+        "airbnb-base"
     ],
-    "parser":"@typescript-eslint/parser",
-    "parserOptions":{
-       "ecmaFeatures":{
-          "jsx":true
-       },
-       "ecmaVersion":"latest",
-       "sourceType":"module"
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+        "ecmaVersion": "latest",
+        "sourceType": "module"
     },
-    "plugins":[
-       "react",
-       "@typescript-eslint",
-       "eslint-plugin-import-helpers",
-       "prettier"
+    "plugins": [
+        "@typescript-eslint",
+        "prettier"
     ],
-    "rules":{
-       "import/no-unresolved":"error",
-       "react/require-default-props":"off",
-       "react/jsx-props-no-spreading":"off",
-       "prettier/prettier":"error",
-       "@typescript-eslint/naming-convention":[
-          "error",
-          {
-             "selector":"interface",
-             "format":[
-                "PascalCase"
-             ],
-             "custom":{
-                "regex":"^I[A-Z]",
-                "match":true
-             }
-          }
-       ],
-       "import/extensions":[
-          "error",
-          "ignorePackages",
-          {
-             "ts":"never",
-             "tsx":"never"
-          }
-       ],
-       "import-helpers/order-imports":[
-          "warn",
-          {
-             "newlinesBetween":"always",
-             "groups":[
-                "module",
-                "/^@shared/",
-                [
-                   "parent",
-                   "sibling",
-                   "index"
-                ]
-             ],
-             "alphabetize":{
-                "order":"asc",
-                "ignoreCase":true
-             }
-          }
-       ],
-       "react/jsx-filename-extension":[
-          1,
-          {
-             "extensions":[
-                ".jsx",
-                ".tsx"
-             ]
-          }
-       ],
-       "react/react-in-jsx-scope":"off",
-       "no-use-before-define":"off",
-       "@typescript-eslint/no-use-before-define":[
-          "error"
-       ]
+    "rules": {
+        "prettier/prettier": "error",
+        "import/extensions":[
+            "error",
+            "ignorePackages",
+            {
+               "ts":"never",
+               "tsx":"never",
+               "js":"never",
+                "jsx":"never"
+            }
+         ]
     },
     "settings":{
-       "import/resolver":{
-          "typescript":{
-             
-          }
-       }
-    }
- }
+        "import/resolver":{
+           "typescript":{
+              
+           }
+        }
+     }
+}
