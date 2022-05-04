@@ -7,29 +7,27 @@ import {
   Center,
   Button,
 } from '@chakra-ui/react';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   BsThermometerHalf,
   BsDroplet,
   BsLightningCharge,
   BsBell,
 } from 'react-icons/bs';
-import { IEspInfo, IEspStatus } from '../../types/ESPTypes';
+import { useMqtt } from '../../contexts/MqttContext';
+import { IEspInfo } from '../../types/ESPTypes';
 import InfoLine from '../InfoLine';
 import Status from '../Status';
 import styles from './MonitoringCard.module.css';
 
 export interface IMonitoringCardProps {
   espInfo: IEspInfo;
-  espStatus: IEspStatus;
   disconect: () => void;
 }
 
-function MonitoringCard({
-  espInfo,
-  espStatus,
-  disconect,
-}: IMonitoringCardProps) {
+function MonitoringCard({ espInfo, disconect }: IMonitoringCardProps) {
+  const mqttClient = useMqtt();
+  const deviceTopic = `${mqttClient.baseTopicstring}/dispositivos/${espInfo.espId}`;
   const [isActivated, setIsActivated] = useState(false);
   const [isAlarmOn, setIsAlarmOn] = useState(false);
   const songRef = useRef(new Audio('/assets/audio/alarm.mp3'));
@@ -43,6 +41,37 @@ function MonitoringCard({
     setIsAlarmOn(alarmActivated);
   };
 
+  const activateOutput = () => {
+    mqttClient.publish(
+      deviceTopic,
+      JSON.stringify({ mode: 'update', state: !isActivated }),
+    );
+    setIsActivated(!isActivated);
+  };
+
+  useEffect(() => {
+    mqttClient.subscribe(`/fse2021/180106970/dispositivos/${espInfo.espId}`);
+    mqttClient.publish(
+      deviceTopic,
+      JSON.stringify({
+        mode: 'register',
+        room: espInfo.room,
+        input: 'sensor de fumaca',
+        output: 'lampada',
+      }),
+    );
+    console.log('no card de mac', espInfo.espId);
+  }, []);
+
+  useEffect(() => {
+    console.log('useffect alarm');
+    if (espInfo.hasAlarm) {
+      console.log('inside useffect alarm');
+
+      audioMenager(espInfo.isAlarmOn || false);
+    }
+  }, [espInfo.isAlarmOn]);
+
   return (
     <Container
       borderWidth="1px"
@@ -50,10 +79,11 @@ function MonitoringCard({
       borderColor="gray.200"
       shadow="md"
       py={3}
+      bg="white"
     >
       <Flex justifyContent="space-between">
         <Text>Cômodo: {espInfo.room}</Text>
-        <Status status={espStatus.status} />
+        <Status status={espInfo.status || 'on'} />
       </Flex>
       <Flex justifyContent="space-between">
         <Text>Nome: {espInfo.name}</Text>
@@ -67,47 +97,50 @@ function MonitoringCard({
           <>
             <InfoLine
               InfoIcon={BsThermometerHalf}
-              // InfoIconColor={temperatura > 0 ? '#d64040' : '#4150d9'}
+              InfoIconColor={
+                (espInfo?.temperature || 0) > 0 ? '#d64040' : '#4150d9'
+              }
               label="Temperatura"
-              value="20ºC"
+              value={`${espInfo?.temperature || 0}ºC`}
             />
 
             <InfoLine
               InfoIcon={BsDroplet}
               label="Humidade"
-              value="20%"
+              value={`${espInfo?.humidity || 0}  %`}
               InfoIconColor="blue"
             />
           </>
         )}
-
         <InfoLine
           InfoIcon={BsLightningCharge}
           InfoIconColor={isActivated ? '#868741' : ''}
-          label="Estado"
+          label={espInfo.outputName || 'Estado'}
+          UpdateComponent={
+            <Switch onChange={activateOutput} defaultChecked={isActivated} />
+          }
+        />
+
+        <InfoLine
+          InfoIcon={BsBell}
+          InfoIconColor={espInfo.isAlarmOn ? 'red' : ''}
+          InfoIconClass={espInfo.isAlarmOn ? styles.alarm : ''}
+          label={espInfo.inputName || 'Alarme'}
           UpdateComponent={
             <Switch
-              onChange={() => setIsActivated(!isActivated)}
-              defaultChecked={isActivated}
+              onChange={() => {
+                console.log('onchange alarm');
+
+                if (espInfo.hasAlarm) {
+                  audioMenager(!isAlarmOn);
+                }
+              }}
+              defaultChecked={espInfo.isAlarmOn}
+              isChecked={espInfo.isAlarmOn}
+              isReadOnly
             />
           }
         />
-        {espInfo?.hasAlarm && (
-          <InfoLine
-            InfoIcon={BsBell}
-            InfoIconColor={isAlarmOn ? 'red' : ''}
-            InfoIconClass={isAlarmOn ? styles.alarm : ''}
-            label="Alarme"
-            UpdateComponent={
-              <Switch
-                onChange={() => {
-                  audioMenager(!isAlarmOn);
-                }}
-                defaultChecked={isAlarmOn}
-              />
-            }
-          />
-        )}
       </Flex>
 
       <Center mt={4}>
