@@ -45,12 +45,10 @@ menu "(FSE-CFG) Modo de Energia"
         default NORMAL_MODE
         help
           Defines ESP energy consumption mode.
-           
-        config NORMAL_POWER_MODE
-            bool "Normal"
-               
+             
         config LOW_POWER_MODE
-            bool "Low Power"
+            int "Modo bateria [1 - Ligado e 0 - Desligado]"
+            default 0
     endchoice
 
 endmenu

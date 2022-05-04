@@ -8,8 +8,6 @@
 #include "mqtt.h"
 #include "sensor.h"
 
-#include <pthread.h>
-
 #define TAG "Main"
 
 xSemaphoreHandle wifi_semaphore;
@@ -47,6 +45,6 @@ void app_main()
 
     wifi_start();
 
-    xTaskCreate(&onWifiConnected, "onWifiConnected", 2048, NULL, 1, NULL);
-    xTaskCreate(&get_sensor_data, "get_sensor_data", 2048, NULL, 1, NULL);
+    xTaskCreate(&onWifiConnected, "onWifiConnected", 4096, NULL, 1, NULL);
+    xTaskCreate(&get_sensor_data, "get_sensor_data", 4096, NULL, 1, NULL);
 }
