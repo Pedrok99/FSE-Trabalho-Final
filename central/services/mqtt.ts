@@ -5,7 +5,9 @@ class MQTTClient {
 
   client: MqttClient | null;
 
-  baseTopicstring: string = '/fse2020/180106970';
+  baseTopicstring: string = '/fse2021/180106970';
+
+  registeredTopics: string[] = [];
 
   constructor(url: string) {
     this.url = url;
@@ -15,9 +17,6 @@ class MQTTClient {
   connect() {
     this.client = connect(this.url);
     this.client.on('connect', () => {
-      this.client?.subscribe('/esp/test', () => {
-        this.client?.publish('/esp/test', 'Connected');
-      });
       console.log('connected');
     });
     this.client.on('error', (err) => {
@@ -31,15 +30,22 @@ class MQTTClient {
     });
   }
 
-  listen(
-    topic: string,
-    callback: (targetTopic: string, recievedMessage: string) => void,
-  ) {
-    this.client?.subscribe(topic, () => {
-      this.client?.on('message', (recievedMessage: string, message: string) => {
-        callback(recievedMessage, message.toString());
-      });
+  listen(callback: (targetTopic: string, recievedMessage: string) => void) {
+    this.client?.on('message', (recievedMessage: string, message: string) => {
+      callback(recievedMessage, message.toString());
     });
+  }
+
+  subscribe(topic: string) {
+    if (!this.registeredTopics.includes(topic)) {
+      this.client?.subscribe(topic, () => {
+        this.registeredTopics.push(topic);
+      });
+    }
+  }
+
+  publish(topic: string, message: string) {
+    this.client?.publish(topic, message);
   }
 }
 

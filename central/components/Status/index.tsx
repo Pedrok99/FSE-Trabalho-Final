@@ -1,15 +1,14 @@
 import { Center, Circle, Text } from '@chakra-ui/react';
 
 import styles from './Status.module.css';
-import { IEspStatus } from '../../types/ESPTypes';
 
-function Status({ status }: IEspStatus) {
+function Status({ status }: { status: 'on' | 'off' }) {
   const statusColor = {
-    Conectado: {
+    on: {
       text: 'green.700',
       circle: 'green',
     },
-    Desconectado: {
+    off: {
       text: 'red.700',
       circle: 'red',
     },
@@ -19,10 +18,10 @@ function Status({ status }: IEspStatus) {
       <Circle
         size={3}
         bg={`${statusColor[status].circle}`}
-        className={`${status === 'Conectado' ? styles.pulsate : ''}`}
+        className={`${status === 'on' ? styles.pulsate : ''}`}
       />
       <Text fontSize="sm" color={`${statusColor[status].text}`}>
-        {status}
+        {status === 'on' ? 'Conectado' : 'Desconectado'}
       </Text>
     </Center>
   );
