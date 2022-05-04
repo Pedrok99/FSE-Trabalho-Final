@@ -5,45 +5,45 @@ import {
   Text,
   Switch,
   Center,
-  Button
-} from '@chakra-ui/react'
-import { useRef, useState } from 'react'
+  Button,
+} from '@chakra-ui/react';
+import { useRef, useState } from 'react';
 import {
   BsThermometerHalf,
   BsDroplet,
   BsLightningCharge,
-  BsBell
-} from 'react-icons/bs'
+  BsBell,
+} from 'react-icons/bs';
 
-import alarmSound from '../../assets/audio/alarm.mp3'
-import { IEspInfo, IEspStatus } from '../../types/ESPTypes'
-import InfoLine from '../InfoLine'
-import Status from '../Status'
-import './styles.css'
+// import alarmSound from '../../assets/audio/alarm.mp3';
+import { IEspInfo, IEspStatus } from '../../types/ESPTypes';
+import InfoLine from '../InfoLine';
+import Status from '../Status';
+import './MonitoringCard.module.css';
 
 export interface IMonitoringCardProps {
-  espInfo: IEspInfo
-  espStatus: IEspStatus
-  disconect: () => void
+  espInfo: IEspInfo;
+  espStatus: IEspStatus;
+  disconect: () => void;
 }
 
 function MonitoringCard({
   espInfo,
   espStatus,
-  disconect
+  disconect,
 }: IMonitoringCardProps) {
-  const [isActivated, setIsActivated] = useState(false)
-  const [isAlarmOn, setIsAlarmOn] = useState(false)
-  const songRef = useRef(new Audio(alarmSound))
-  songRef.current.loop = true
-  const audioMenager = (alarmActivated: boolean) => {
-    if (alarmActivated) {
-      songRef.current.play()
-    } else {
-      songRef.current.pause()
-    }
-    setIsAlarmOn(alarmActivated)
-  }
+  const [isActivated, setIsActivated] = useState(false);
+  const [isAlarmOn, setIsAlarmOn] = useState(false);
+  // const songRef = useRef(new Audio(alarmSound));
+  // songRef.current.loop = true;
+  // const audioMenager = (alarmActivated: boolean) => {
+  //   if (alarmActivated) {
+  //     songRef.current.play();
+  //   } else {
+  //     songRef.current.pause();
+  //   }
+  //   setIsAlarmOn(alarmActivated);
+  // };
 
   return (
     <Container
@@ -103,7 +103,7 @@ function MonitoringCard({
             UpdateComponent={
               <Switch
                 onChange={() => {
-                  audioMenager(!isAlarmOn)
+                  // audioMenager(!isAlarmOn);
                 }}
                 defaultChecked={isAlarmOn}
               />
@@ -117,16 +117,16 @@ function MonitoringCard({
           size="sm"
           colorScheme="red"
           onClick={() => {
-            audioMenager(false)
-            songRef.current.remove()
-            disconect()
+            // audioMenager(false);
+            // songRef.current.remove();
+            disconect();
           }}
         >
           Desconectar
         </Button>
       </Center>
     </Container>
-  )
+  );
 }
 
-export default MonitoringCard
+export default MonitoringCard;
