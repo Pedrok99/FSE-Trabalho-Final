@@ -13,6 +13,7 @@
 
 xSemaphoreHandle wifi_semaphore;
 xSemaphoreHandle conexaoMQTTSemaphore;
+xSemaphoreHandle initialMQTTSemaphore;
 
 void onWifiConnected(void *params)
 {
@@ -41,12 +42,14 @@ void app_main()
         ret = nvs_flash_init();
     }
     ESP_ERROR_CHECK(ret);
+
     conexaoMQTTSemaphore = xSemaphoreCreateBinary();
+    initialMQTTSemaphore = xSemaphoreCreateBinary();
     wifi_semaphore = xSemaphoreCreateBinary();
 
     wifi_start();
 
-    xTaskCreate(&onWifiConnected, "onWifiConnected", 4096, NULL, 1, NULL);
-    xTaskCreate(&get_sensor_data, "get_sensor_data", 4096, NULL, 1, NULL);
+    xTaskCreate(&onWifiConnected, "onWifiConnected", 8192, NULL, 1, NULL);
+    xTaskCreate(&get_sensor_data, "get_sensor_data", 8192, NULL, 1, NULL);
     xTaskCreate(&config_button, "config_button", 4096, NULL, 1, NULL);
 }

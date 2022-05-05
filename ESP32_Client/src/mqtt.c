@@ -21,9 +21,13 @@
 #include "cJSON.h"
 #include "mqtt.h"
 
+#include "memory_data.h"
+#include <nvs_component.h>
+
 #define TAG "MQTT"
 
 extern xSemaphoreHandle conexaoMQTTSemaphore;
+extern xSemaphoreHandle initialMQTTSemaphore;
 esp_mqtt_client_handle_t client;
 
 static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event)
@@ -97,17 +101,18 @@ static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event)
             cJSON *input = cJSON_GetObjectItem(config, "input");
             cJSON *output = cJSON_GetObjectItem(config, "output");
 
-            char room_value[20];
-            char input_value[20];
-            char output_value[20];
+            memory_data_t *tmp_data = malloc(sizeof(memory_data_t));
 
-            strcpy(room_value, room->valuestring);
-            strcpy(input_value, input->valuestring);
-            strcpy(output_value, output->valuestring);
+            strcpy(tmp_data->room, room->valuestring);
+            strcpy(tmp_data->input, input->valuestring);
+            strcpy(tmp_data->output, output->valuestring);
 
-            ESP_LOGI(TAG, "Room: %s", room_value);
-            ESP_LOGI(TAG, "Input: %s", input_value);
-            ESP_LOGI(TAG, "Output: %s", output_value);
+            ESP_LOGI(TAG, "ROOM: %s", tmp_data->room);
+            ESP_LOGI(TAG, "INPUT: %s", tmp_data->input);
+            ESP_LOGI(TAG, "OUTPUT: %s", tmp_data->output);
+
+            write_struct("DATA", tmp_data, sizeof(memory_data_t));
+            xSemaphoreGive(initialMQTTSemaphore);
         }
         else if (strcmp(mode_value, "update") == 0)
         {
