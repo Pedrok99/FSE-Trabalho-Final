@@ -7,6 +7,7 @@ import {
   FormErrorMessage,
   FormLabel,
   Input,
+  Select,
   Stack,
 } from '@chakra-ui/react';
 import { useForm } from 'react-hook-form';
@@ -16,9 +17,10 @@ import { IEspInfo } from '../../types/ESPTypes';
 interface IAddFormProps {
   addEspInfo: (espInfo: IEspInfo) => void;
   onClose: () => void;
+  espMacs: string[];
 }
 
-function AddForm({ addEspInfo, onClose }: IAddFormProps) {
+function AddForm({ addEspInfo, onClose, espMacs }: IAddFormProps) {
   const {
     handleSubmit,
     register,
@@ -26,6 +28,7 @@ function AddForm({ addEspInfo, onClose }: IAddFormProps) {
   } = useForm<IEspInfo>();
 
   const onSubmit = (data: IEspInfo) => {
+    console.log(data);
     addEspInfo({
       ...data,
       status: 'off',
@@ -39,14 +42,28 @@ function AddForm({ addEspInfo, onClose }: IAddFormProps) {
       <FormControl isInvalid={!!errors.name}>
         <Box mb={4}>
           <FormLabel htmlFor="espId">ESP32 ID</FormLabel>
-          <Input
+          {/* <Input
             type="text"
             placeholder="MAC_ADRESS da ESP"
             id="espId"
             {...register('espId', {
               required: 'Campo obrigatório',
             })}
-          />
+          /> */}
+
+          <Select
+            placeholder="Selecione uma ESP"
+            id="espId"
+            {...register('espId', {
+              required: 'Campo obrigatório',
+            })}
+          >
+            {espMacs.map((espMac) => (
+              <option key={espMac} value={espMac}>
+                {espMac}
+              </option>
+            ))}
+          </Select>
           <FormErrorMessage>
             {errors.espId && errors.espId.message}
           </FormErrorMessage>
