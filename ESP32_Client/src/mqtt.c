@@ -17,6 +17,8 @@
 #include "esp_log.h"
 #include "mqtt_client.h"
 
+#include "led.h"
+#include "cJSON.h"
 #include "mqtt.h"
 
 #define TAG "MQTT"
@@ -28,8 +30,6 @@ static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event)
 {
     esp_mqtt_client_handle_t client = event->client;
     int msg_id;
-
-    // send initial data
 
     // get mac
     uint8_t mac[6];
@@ -50,14 +50,15 @@ static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event)
         // fse2021/<matricula>/dispositivos/<ID_do_dispositivo>
         sprintf(config_topic, "/%s/%s/dispositivos/%s", CONFIG_ESP_ROOT_TOPIC, CONFIG_ESP_MATRICULA, mac_str);
 
-        msg_id = esp_mqtt_client_publish(client, config_topic, "{key:value}", 0, 1, 0);
+        char data[255];
+        sprintf(data, "{\"mode\": \"register\", \"mac\": \"%s\", \"battery\": %d}", mac_str, CONFIG_LOW_POWER_MODE);
+        msg_id = esp_mqtt_client_publish(client, config_topic, data, 0, 1, 0);
         ESP_LOGI(TAG, "sent publish to %s, msg_id=%d", config_topic, msg_id);
 
         msg_id = esp_mqtt_client_subscribe(client, config_topic, 0);
         ESP_LOGI(TAG, "Subscribed to %s, msg_id=%d", config_topic, msg_id);
 
         xSemaphoreGive(conexaoMQTTSemaphore);
-
         break;
 
     case MQTT_EVENT_DISCONNECTED:
@@ -78,12 +79,43 @@ static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event)
 
     case MQTT_EVENT_DATA:
         ESP_LOGI(TAG, "MQTT_EVENT_DATA_TRIGGERED");
-        // handleTopicEvent(event);
-        if (strcmp(event->topic, config_topic) == 0)
+
+        printf("TOPIC=%.*s\r\n", event->topic_len, event->topic);
+        event->data[event->data_len] = '\0';
+        printf("DATA=%s\r\n", event->data);
+
+        cJSON *config = cJSON_Parse(event->data);
+
+        cJSON *mode = cJSON_GetObjectItem(config, "mode");
+        char mode_value[20];
+        strcpy(mode_value, mode->valuestring);
+        printf("Mode: %s\r\n", mode_value);
+
+        if (strcmp(mode_value, "register") == 0)
         {
-            printf("TOPIC=%.*s\r\n", event->topic_len, event->topic);
-            printf("DATA=%.*s\r\n", event->data_len, event->data);
+            cJSON *room = cJSON_GetObjectItem(config, "room");
+            cJSON *input = cJSON_GetObjectItem(config, "input");
+            cJSON *output = cJSON_GetObjectItem(config, "output");
+
+            char room_value[20];
+            char input_value[20];
+            char output_value[20];
+
+            strcpy(room_value, room->valuestring);
+            strcpy(input_value, input->valuestring);
+            strcpy(output_value, output->valuestring);
+
+            printf("Room: %s\r\n", room_value);
+            printf("Input: %s\r\n", input_value);
+            printf("Output: %s\r\n", output_value);
         }
+        else if (strcmp(mode_value, "update") == 0)
+        {
+            int state = cJSON_GetObjectItem(config, "state")->valueint;
+            printf("State: %d\r\n", state);
+            set_led_state(state);
+        }
+        // }
         break;
 
     case MQTT_EVENT_ERROR:

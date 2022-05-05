@@ -5,12 +5,21 @@
 #include "esp_log.h"
 #include "mqtt.h"
 #include "esp_system.h"
+#include "sensor.h"
+#include "led.h"
 
 extern xSemaphoreHandle conexaoMQTTSemaphore;
 #define TAG "Sensor"
 
 void get_sensor_data(void *pvParameters)
 {
+    uint8_t mac[6];
+    esp_read_mac(mac, ESP_MAC_WIFI_STA);
+
+    // convert mac to string
+    char mac_str[18];
+    sprintf(mac_str, "%02x:%02x:%02x:%02x:%02x:%02x", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+
     DHT11_init(GPIO_NUM_4);
     int initial_temperature = DHT11_read().temperature;
     int initial_humidity = DHT11_read().humidity;
@@ -26,11 +35,11 @@ void get_sensor_data(void *pvParameters)
         {
             count = 0;
 
-            sprintf(tmp_data, "{\"data\": %f}", temperature_avg);
+            sprintf(tmp_data, "{\"data\": %f, \"mac\": \"%s\"}", temperature_avg, mac_str);
             ESP_LOGI(TAG, "Temperatura: %f", temperature_avg);
             mqtt_envia_mensagem("/fse2021/180106970/sala/temperatura", tmp_data);
 
-            sprintf(tmp_data, "{\"data\": %f}", humidity_avg);
+            sprintf(tmp_data, "{\"data\": %f, \"mac\": \"%s\"}", humidity_avg, mac_str);
             ESP_LOGI(TAG, "Umidade: %f", humidity_avg);
             mqtt_envia_mensagem("/fse2021/180106970/sala/umidade", tmp_data);
         }
