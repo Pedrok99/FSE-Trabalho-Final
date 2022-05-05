@@ -12,6 +12,13 @@
 O objetivo deste trabalho é criar um sistema distribuído de Automação Residencial utilizando um computador como sistema computacional central e microcontroladores ESP32 como dispositivos distribuídos, interconectados via Wifi através do protocolo MQTT.
 
 ![exemplo gif](img/example.gif)
+
+![exemplo gif](img/example2.gif)
+
+## Apresentação do projeto
+
+A dupla gravou uma apresentação do projeto e disponibilizou no seguinte [link](https://www.youtube.com/watch?v=9WtdAng3mqA&ab_channel=PedroHenrique).
+
 ## Executando o projeto
 
 Comandos para executar as partes do projeto:
