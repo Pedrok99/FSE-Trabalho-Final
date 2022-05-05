@@ -17,7 +17,7 @@ O objetivo deste trabalho é criar um sistema distribuído de Automação Reside
 
 ***Observações:***
 
-O projeto utiliza o broker público: ```broker.hivemq.com```
+O projeto utiliza o broker público: [broker.hivemq.com](https://www.hivemq.com/public-mqtt-broker/)
 
 - TCP Port: ```1883```
 - Websocket Port: ```8000```
