@@ -41,8 +41,6 @@ void get_sensor_data(void *pvParameters)
     strcpy(memory_data->output, "\0");
     memory_data->temperature = 0;
 
-    // vTaskDelay(10000 / portTICK_PERIOD_MS);
-
     while (1)
     {
         if (xSemaphoreTake(initialMQTTSemaphore, portMAX_DELAY))

@@ -50,14 +50,39 @@ static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event)
         ESP_LOGI(TAG, "MQTT_EVENT_CONNECTED");
         // xSemaphoreTake(conexaoMQTTSemaphore, portMAX_DELAY);
 
+        memory_data_t *memory_data = malloc(sizeof(memory_data_t));
+        strcpy(memory_data->room, "\0");
+        strcpy(memory_data->input, "\0");
+        strcpy(memory_data->output, "\0");
+        memory_data->temperature = 0;
+
+        read_struct("DATA", &memory_data, sizeof(memory_data_t));
+
+        ESP_LOGI(TAG, "Room: %s", memory_data->room);
+        ESP_LOGI(TAG, "Input: %s", memory_data->input);
+        ESP_LOGI(TAG, "Output: %s", memory_data->output);
+        ESP_LOGI(TAG, "TEMPERATURE: %d", memory_data->temperature);
+        // xSemaphoreGive(initialMQTTSemaphore);
+
         char config_topic[255];
         // fse2021/<matricula>/dispositivos/<ID_do_dispositivo>
         sprintf(config_topic, "/%s/%s/dispositivos/%s", CONFIG_ESP_ROOT_TOPIC, CONFIG_ESP_MATRICULA, mac_str);
 
-        char data[255];
-        sprintf(data, "{\"mode\": \"register\", \"mac\": \"%s\", \"battery\": %d}", mac_str, CONFIG_LOW_POWER_MODE);
-        msg_id = esp_mqtt_client_publish(client, config_topic, data, 0, 1, 0);
-        ESP_LOGI(TAG, "sent publish to %s, msg_id=%d", config_topic, msg_id);
+        if (strcmp(memory_data->room, "\0") != 0)
+        {
+            ESP_LOGI(TAG, "Room: %s", memory_data->room);
+            char data[255];
+            sprintf(data, "{\"mode\": \"re-register\", \"mac\": \"%s\", \"battery\": %d, \"room\": \"%s\", \"input\": \"%s\", \"output\": \"%s\", \"temperature\": \"%d\"}", mac_str, CONFIG_LOW_POWER_MODE, memory_data->room, memory_data->input, memory_data->output, memory_data->temperature);
+            msg_id = esp_mqtt_client_publish(client, config_topic, data, 0, 1, 0);
+            ESP_LOGI(TAG, "sent publish to %s, msg_id=%d", config_topic, msg_id);
+        }
+        else
+        {
+            char data[255];
+            sprintf(data, "{\"mode\": \"register\", \"mac\": \"%s\", \"battery\": %d}", mac_str, CONFIG_LOW_POWER_MODE);
+            msg_id = esp_mqtt_client_publish(client, config_topic, data, 0, 1, 0);
+            ESP_LOGI(TAG, "sent publish to %s, msg_id=%d", config_topic, msg_id);
+        }
 
         msg_id = esp_mqtt_client_subscribe(client, config_topic, 0);
         ESP_LOGI(TAG, "Subscribed to %s, msg_id=%d", config_topic, msg_id);
