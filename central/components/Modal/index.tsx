@@ -4,15 +4,15 @@ import {
   ModalContent,
   ModalHeader,
   ModalBody,
-  ModalCloseButton
-} from '@chakra-ui/react'
-import { ReactNode } from 'react'
+  ModalCloseButton,
+} from '@chakra-ui/react';
+import { ReactNode } from 'react';
 
 interface IModalPros {
-  children?: ReactNode
-  title: string
-  isOpen: boolean
-  onClose: () => void
+  children?: ReactNode;
+  title: string;
+  isOpen: boolean;
+  onClose: () => void;
 }
 
 function AddESPModal({ children, isOpen, onClose, title }: IModalPros) {
@@ -26,7 +26,7 @@ function AddESPModal({ children, isOpen, onClose, title }: IModalPros) {
         <ModalBody>{children}</ModalBody>
       </ModalContent>
     </Modal>
-  )
+  );
 }
 
-export default AddESPModal
+export default AddESPModal;
