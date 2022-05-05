@@ -39,6 +39,7 @@ void get_sensor_data(void *pvParameters)
     strcpy(memory_data->room, "\0");
     strcpy(memory_data->input, "\0");
     strcpy(memory_data->output, "\0");
+    memory_data->temperature = 0;
 
     // vTaskDelay(10000 / portTICK_PERIOD_MS);
 
@@ -51,13 +52,14 @@ void get_sensor_data(void *pvParameters)
             ESP_LOGI(TAG, "Room: %s", memory_data->room);
             ESP_LOGI(TAG, "Input: %s", memory_data->input);
             ESP_LOGI(TAG, "Output: %s", memory_data->output);
+            ESP_LOGI(TAG, "TEMPERATURE: %d", memory_data->temperature);
             xSemaphoreGive(initialMQTTSemaphore);
             break;
         }
         vTaskDelay(200 / portTICK_PERIOD_MS);
     }
 
-    while (1)
+    while (memory_data->temperature != 0)
     {
         if (count == 5)
         {
@@ -93,5 +95,10 @@ void get_sensor_data(void *pvParameters)
             xSemaphoreGive(conexaoMQTTSemaphore);
         }
         vTaskDelay(2000 / portTICK_PERIOD_MS);
+    }
+
+    while (1)
+    {
+        vTaskDelay(portMAX_DELAY);
     }
 }

@@ -100,16 +100,19 @@ static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event)
             cJSON *room = cJSON_GetObjectItem(config, "room");
             cJSON *input = cJSON_GetObjectItem(config, "input");
             cJSON *output = cJSON_GetObjectItem(config, "output");
+            cJSON *temperature = cJSON_GetObjectItem(config, "temperature");
 
             memory_data_t *tmp_data = malloc(sizeof(memory_data_t));
 
             strcpy(tmp_data->room, room->valuestring);
             strcpy(tmp_data->input, input->valuestring);
             strcpy(tmp_data->output, output->valuestring);
+            tmp_data->temperature = temperature->valueint;
 
             ESP_LOGI(TAG, "ROOM: %s", tmp_data->room);
             ESP_LOGI(TAG, "INPUT: %s", tmp_data->input);
             ESP_LOGI(TAG, "OUTPUT: %s", tmp_data->output);
+            ESP_LOGI(TAG, "TEMPERATURE: %d", tmp_data->temperature);
 
             write_struct("DATA", tmp_data, sizeof(memory_data_t));
             xSemaphoreGive(initialMQTTSemaphore);
