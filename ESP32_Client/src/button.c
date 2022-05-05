@@ -8,9 +8,15 @@
 #include "button.h"
 #include "mqtt.h"
 
+#include <nvs_component.h>
+#include "memory_data.h"
+#include "string.h"
+
 #define BUTTON_GPIO 0
 #define TAG "BUTTON"
+
 extern xSemaphoreHandle conexaoMQTTSemaphore;
+extern xSemaphoreHandle initialMQTTSemaphore;
 
 void config_button(void *pvParameters)
 {
@@ -32,6 +38,28 @@ void config_button(void *pvParameters)
     int prev_state = 1;
     int status = 0;
 
+    memory_data_t *memory_data = malloc(sizeof(memory_data_t));
+    strcpy(memory_data->room, "\0");
+    strcpy(memory_data->input, "\0");
+    strcpy(memory_data->output, "\0");
+
+    while (1)
+    {
+        if (xSemaphoreTake(initialMQTTSemaphore, portMAX_DELAY))
+        {
+            ESP_LOGI(TAG, "MQTT CONNECTED");
+            read_struct("DATA", &memory_data, sizeof(memory_data_t));
+            ESP_LOGI(TAG, "Room: %s", memory_data->room);
+            ESP_LOGI(TAG, "Input: %s", memory_data->input);
+            ESP_LOGI(TAG, "Output: %s", memory_data->output);
+            xSemaphoreGive(initialMQTTSemaphore);
+            break;
+        }
+        vTaskDelay(200 / portTICK_PERIOD_MS);
+    }
+    char state_topic[100];
+    sprintf(state_topic, "/%s/%s/%s/estado", CONFIG_ESP_ROOT_TOPIC, CONFIG_ESP_MATRICULA, memory_data->room);
+
     while (1)
     {
         int button_state = gpio_get_level(BUTTON_GPIO);
@@ -50,7 +78,7 @@ void config_button(void *pvParameters)
                 sprintf(tmp_data, "{\"data\": %d, \"mac\": \"%s\"}", status, mac_str);
                 ESP_LOGI(TAG, "BUTTON: %d", status);
 
-                mqtt_envia_mensagem("/fse2021/180106970/sala/estado", tmp_data);
+                mqtt_envia_mensagem(state_topic, tmp_data);
             }
             xSemaphoreGive(conexaoMQTTSemaphore);
         }

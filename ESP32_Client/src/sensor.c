@@ -8,7 +8,12 @@
 #include "sensor.h"
 #include "led.h"
 
+#include <nvs_component.h>
+#include "memory_data.h"
+#include "string.h"
+
 extern xSemaphoreHandle conexaoMQTTSemaphore;
+extern xSemaphoreHandle initialMQTTSemaphore;
 #define TAG "SENSOR"
 
 void get_sensor_data(void *pvParameters)
@@ -29,21 +34,46 @@ void get_sensor_data(void *pvParameters)
 
     char tmp_data[50];
     int count = 0;
+
+    memory_data_t *memory_data = malloc(sizeof(memory_data_t));
+    strcpy(memory_data->room, "\0");
+    strcpy(memory_data->input, "\0");
+    strcpy(memory_data->output, "\0");
+
+    // vTaskDelay(10000 / portTICK_PERIOD_MS);
+
+    while (1)
+    {
+        if (xSemaphoreTake(initialMQTTSemaphore, portMAX_DELAY))
+        {
+            ESP_LOGI(TAG, "MQTT CONNECTED");
+            read_struct("DATA", &memory_data, sizeof(memory_data_t));
+            ESP_LOGI(TAG, "Room: %s", memory_data->room);
+            ESP_LOGI(TAG, "Input: %s", memory_data->input);
+            ESP_LOGI(TAG, "Output: %s", memory_data->output);
+            xSemaphoreGive(initialMQTTSemaphore);
+            break;
+        }
+        vTaskDelay(200 / portTICK_PERIOD_MS);
+    }
+
     while (1)
     {
         if (count == 5)
         {
             count = 0;
 
+            char temperature_topic[100], humidity_topic[100];
+            sprintf(temperature_topic, "/%s/%s/%s/temperatura", CONFIG_ESP_ROOT_TOPIC, CONFIG_ESP_MATRICULA, memory_data->room);
+            sprintf(humidity_topic, "/%s/%s/%s/umidade", CONFIG_ESP_ROOT_TOPIC, CONFIG_ESP_MATRICULA, memory_data->room);
+
             sprintf(tmp_data, "{\"data\": %f, \"mac\": \"%s\"}", temperature_avg, mac_str);
             ESP_LOGI(TAG, "Temperatura: %f", temperature_avg);
-            mqtt_envia_mensagem("/fse2021/180106970/sala/temperatura", tmp_data);
-
-            vTaskDelay(1000 / portTICK_PERIOD_MS);
+            mqtt_envia_mensagem(temperature_topic, tmp_data);
 
             sprintf(tmp_data, "{\"data\": %f, \"mac\": \"%s\"}", humidity_avg, mac_str);
             ESP_LOGI(TAG, "Umidade: %f", humidity_avg);
-            mqtt_envia_mensagem("/fse2021/180106970/sala/umidade", tmp_data);
+            mqtt_envia_mensagem(humidity_topic, tmp_data);
         }
 
         if (xSemaphoreTake(conexaoMQTTSemaphore, portMAX_DELAY))
