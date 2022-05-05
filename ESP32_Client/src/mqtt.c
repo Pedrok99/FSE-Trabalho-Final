@@ -72,7 +72,7 @@ static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event)
         {
             ESP_LOGI(TAG, "Room: %s", memory_data->room);
             char data[255];
-            sprintf(data, "{\"mode\": \"re-register\", \"mac\": \"%s\", \"battery\": %d, \"room\": \"%s\", \"input\": \"%s\", \"output\": \"%s\", \"temperature\": \"%d\"}", mac_str, CONFIG_LOW_POWER_MODE, memory_data->room, memory_data->input, memory_data->output, memory_data->temperature);
+            sprintf(data, "{\"mode\": \"re-register\", \"mac\": \"%s\", \"battery\": %d, \"room\": \"%s\", \"input\": \"%s\", \"output\": \"%s\", \"temperature\": %d}", mac_str, CONFIG_LOW_POWER_MODE, memory_data->room, memory_data->input, memory_data->output, memory_data->temperature);
             msg_id = esp_mqtt_client_publish(client, config_topic, data, 0, 1, 0);
             ESP_LOGI(TAG, "sent publish to %s, msg_id=%d", config_topic, msg_id);
         }
