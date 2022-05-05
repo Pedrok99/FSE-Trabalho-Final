@@ -7,8 +7,9 @@
 #include "esp_system.h"
 #include "mqtt.h"
 #include "sensor.h"
+#include "button.h"
 
-#define TAG "Main"
+#define TAG "MAIN"
 
 xSemaphoreHandle wifi_semaphore;
 xSemaphoreHandle conexaoMQTTSemaphore;
@@ -47,4 +48,5 @@ void app_main()
 
     xTaskCreate(&onWifiConnected, "onWifiConnected", 4096, NULL, 1, NULL);
     xTaskCreate(&get_sensor_data, "get_sensor_data", 4096, NULL, 1, NULL);
+    xTaskCreate(&config_button, "config_button", 4096, NULL, 1, NULL);
 }

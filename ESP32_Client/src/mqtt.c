@@ -80,16 +80,16 @@ static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event)
     case MQTT_EVENT_DATA:
         ESP_LOGI(TAG, "MQTT_EVENT_DATA_TRIGGERED");
 
-        printf("TOPIC=%.*s\r\n", event->topic_len, event->topic);
+        ESP_LOGI(TAG, "TOPIC=%.*s", event->topic_len, event->topic);
+        ESP_LOGI(TAG, "DATA=%.*s", event->data_len, event->data);
         event->data[event->data_len] = '\0';
-        printf("DATA=%s\r\n", event->data);
 
         cJSON *config = cJSON_Parse(event->data);
 
         cJSON *mode = cJSON_GetObjectItem(config, "mode");
         char mode_value[20];
         strcpy(mode_value, mode->valuestring);
-        printf("Mode: %s\r\n", mode_value);
+        ESP_LOGI(TAG, "mode: %s", mode_value);
 
         if (strcmp(mode_value, "register") == 0)
         {
@@ -105,17 +105,18 @@ static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event)
             strcpy(input_value, input->valuestring);
             strcpy(output_value, output->valuestring);
 
-            printf("Room: %s\r\n", room_value);
-            printf("Input: %s\r\n", input_value);
-            printf("Output: %s\r\n", output_value);
+            ESP_LOGI(TAG, "Room: %s", room_value);
+            ESP_LOGI(TAG, "Input: %s", input_value);
+            ESP_LOGI(TAG, "Output: %s", output_value);
         }
         else if (strcmp(mode_value, "update") == 0)
         {
             int state = cJSON_GetObjectItem(config, "state")->valueint;
-            printf("State: %d\r\n", state);
+            ESP_LOGI(TAG, "State: %d", state);
             set_led_state(state);
         }
-        // }
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
+
         break;
 
     case MQTT_EVENT_ERROR:

@@ -9,7 +9,7 @@
 #include "led.h"
 
 extern xSemaphoreHandle conexaoMQTTSemaphore;
-#define TAG "Sensor"
+#define TAG "SENSOR"
 
 void get_sensor_data(void *pvParameters)
 {
@@ -39,6 +39,8 @@ void get_sensor_data(void *pvParameters)
             ESP_LOGI(TAG, "Temperatura: %f", temperature_avg);
             mqtt_envia_mensagem("/fse2021/180106970/sala/temperatura", tmp_data);
 
+            vTaskDelay(1000 / portTICK_PERIOD_MS);
+
             sprintf(tmp_data, "{\"data\": %f, \"mac\": \"%s\"}", humidity_avg, mac_str);
             ESP_LOGI(TAG, "Umidade: %f", humidity_avg);
             mqtt_envia_mensagem("/fse2021/180106970/sala/umidade", tmp_data);
@@ -57,9 +59,9 @@ void get_sensor_data(void *pvParameters)
                 humidity_avg = (humidity_avg * 0.8) + (float)data.humidity * 0.2;
             }
 
-            vTaskDelay(2000 / portTICK_PERIOD_MS);
             count++;
             xSemaphoreGive(conexaoMQTTSemaphore);
         }
+        vTaskDelay(2000 / portTICK_PERIOD_MS);
     }
 }
