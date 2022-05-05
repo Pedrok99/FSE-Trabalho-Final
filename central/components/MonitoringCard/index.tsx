@@ -27,7 +27,7 @@ export interface IMonitoringCardProps {
 
 function MonitoringCard({ espInfo, disconect }: IMonitoringCardProps) {
   const mqttClient = useMqtt();
-  const deviceTopic = `${mqttClient.baseTopicstring}/dispositivos/${espInfo.espId}`;
+  const deviceTopic = `${mqttClient.baseTopicString}/dispositivos/${espInfo.espId}`;
   const [isActivated, setIsActivated] = useState(false);
   const [isAlarmOn, setIsAlarmOn] = useState(false);
   const songRef = useRef(new Audio('/assets/audio/alarm.mp3'));
@@ -49,25 +49,31 @@ function MonitoringCard({ espInfo, disconect }: IMonitoringCardProps) {
     setIsActivated(!isActivated);
   };
 
+  const disconnectEsp = () => {
+    mqttClient.unsubscribe(`${mqttClient.baseTopicString}/${espInfo.room}/+`);
+    disconect();
+  };
+
   useEffect(() => {
-    mqttClient.subscribe(`/fse2021/180106970/dispositivos/${espInfo.espId}`);
+    mqttClient.subscribe(`${mqttClient.baseTopicString}/${espInfo.room}/+`);
+    // mqttClient.subscribe(`/fse2021/180106970/dispositivos/${espInfo.espId}`);
     mqttClient.publish(
       deviceTopic,
       JSON.stringify({
         mode: 'register',
         room: espInfo.room,
-        input: 'sensor de fumaca',
-        output: 'lampada',
+        input: espInfo.inputName,
+        output: espInfo.outputName,
+        temperature: espInfo.hasTempSensor || false,
       }),
     );
-    console.log('no card de mac', espInfo.espId);
+    console.log(
+      `subscribed to : ${mqttClient.baseTopicString}/${espInfo.room}/+`,
+    );
   }, []);
 
   useEffect(() => {
-    console.log('useffect alarm');
     if (espInfo.hasAlarm) {
-      console.log('inside useffect alarm');
-
       audioMenager(espInfo.isAlarmOn || false);
     }
   }, [espInfo.isAlarmOn]);
@@ -83,7 +89,7 @@ function MonitoringCard({ espInfo, disconect }: IMonitoringCardProps) {
     >
       <Flex justifyContent="space-between">
         <Text>Cômodo: {espInfo.room}</Text>
-        <Status status={espInfo.status || 'on'} />
+        <Status status={'on'} />
       </Flex>
       <Flex justifyContent="space-between">
         <Text>Nome: {espInfo.name}</Text>
@@ -150,7 +156,7 @@ function MonitoringCard({ espInfo, disconect }: IMonitoringCardProps) {
           onClick={() => {
             audioMenager(false);
             songRef.current.remove();
-            disconect();
+            disconnectEsp();
           }}
         >
           Desconectar

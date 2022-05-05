@@ -1,13 +1,14 @@
 import { MqttClient, connect } from 'mqtt';
+import { toast } from 'react-toastify';
 
 class MQTTClient {
-  url: string;
+  private url: string;
 
   client: MqttClient | null;
 
-  baseTopicstring: string = '/fse2021/180106970';
+  baseTopicString: string = '/fse2021/180106970';
 
-  registeredTopics: string[] = [];
+  private registeredTopics: string[] = [];
 
   constructor(url: string) {
     this.url = url;
@@ -17,16 +18,16 @@ class MQTTClient {
   connect() {
     this.client = connect(this.url);
     this.client.on('connect', () => {
-      console.log('connected');
+      toast.success('Connected to MQTT broker');
     });
     this.client.on('error', (err) => {
-      console.log('error', err);
+      toast.error('Error connecting to MQTT broker');
     });
     this.client.on('close', () => {
-      console.log('close');
+      toast.error('Disconnected from MQTT broker');
     });
     this.client.on('offline', () => {
-      console.log('offline');
+      toast.error('Disconnected from MQTT broker');
     });
   }
 
@@ -40,6 +41,16 @@ class MQTTClient {
     if (!this.registeredTopics.includes(topic)) {
       this.client?.subscribe(topic, () => {
         this.registeredTopics.push(topic);
+      });
+    }
+  }
+
+  unsubscribe(topic: string) {
+    if (this.registeredTopics.includes(topic)) {
+      this.client?.unsubscribe(topic, () => {
+        this.registeredTopics = this.registeredTopics.filter(
+          (registeredTopic) => registeredTopic !== topic,
+        );
       });
     }
   }

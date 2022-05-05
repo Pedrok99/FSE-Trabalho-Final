@@ -63,6 +63,7 @@ function handleDeviceMessageAction(
   },
   currentEsps: IEspInfo[],
   addDetectedEspMacs: (mac: string) => void,
+  addReturningEsp: (espInfo: IEspInfo) => void,
 ) {
   console.log('Handling device message');
   const targetTopic = mqttMessage?.topic?.split('/')[4];
@@ -72,12 +73,27 @@ function handleDeviceMessageAction(
   switch (parsedMessage?.mode) {
     case 'register':
       if (
-        parsedMessage?.mac
-        && !currentEsps.find((esp) => esp.espId === parsedMessage?.mac)
+        parsedMessage?.mac &&
+        !currentEsps.find((esp) => esp.espId === parsedMessage?.mac)
       ) {
         toast.success(`ESP ${parsedMessage?.mac} detectada.`);
         addDetectedEspMacs(parsedMessage?.mac);
       }
+      break;
+    case 're-register':
+      addReturningEsp({
+        espId: parsedMessage?.mac,
+        isAlarmOn: false,
+        temperature: 0,
+        humidity: 0,
+        inputName: parsedMessage?.input,
+        outputName: parsedMessage?.output,
+        hasTempSensor: parsedMessage?.temperature,
+        room: parsedMessage?.room,
+        status: 'on',
+        name: `Esp ${parsedMessage?.room}`,
+        hasAlarm: false,
+      });
       break;
 
     default:

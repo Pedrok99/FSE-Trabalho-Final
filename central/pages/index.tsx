@@ -1,5 +1,5 @@
 import type { NextPage } from 'next';
-import { Box, Button, Grid, GridItem, useDisclosure } from '@chakra-ui/react';
+import { Box, Grid, GridItem, useDisclosure } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
 
 import { toast } from 'react-toastify';
@@ -44,14 +44,17 @@ const Home: NextPage = () => {
 
   useEffect(() => {
     client.connect();
-    client.subscribe('/fse2021/180106970/dispositivos/+');
-    client.subscribe('/fse2021/180106970/sala/+');
+    client.subscribe(`${client.baseTopicString}/dispositivos/+`);
     client.listen(messageHandler);
-    toast.success('Conectado ao broker MQTT');
   }, []);
   useEffect(() => {
     if (mqttMessage?.topic?.includes('dispositivos')) {
-      handleDeviceMessageAction(mqttMessage, ESPsInfo, addDetectedEspMacs);
+      handleDeviceMessageAction(
+        mqttMessage,
+        ESPsInfo,
+        addDetectedEspMacs,
+        addEspInfo,
+      );
     } else {
       const updatedOutputState = handleOutputMessageAction(
         mqttMessage,
@@ -59,16 +62,10 @@ const Home: NextPage = () => {
       );
       setESPsInfo(updatedOutputState);
     }
-
-    // console.log(mqttMessage);
   }, [mqttMessage]);
-  // useEffect(() => {
-  //   if (detectedEspMacs.length > 0) {
-  //     onOpen();
-  //   }
-  // }, [detectedEspMacs]);
 
   useEffect(() => {
+    console.log('ussf', detectedEspMacs);
     const filteredDetectedEsps: string[] = [];
     ESPsInfo.forEach((esp) => {
       if (!detectedEspMacs.includes(esp.espId)) {
